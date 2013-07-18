@@ -30,10 +30,10 @@ public class SplitParser extends Parser
   {
     if(!set.get("attribute").equals("timestamp"))
     {
-      if (user.getStatMap().get(set.get("attribute"))==null){
-        user.getStatMap().put((String) set.get("attribute"), new DimensionValueStats());
+      if (user.getDimensionValues().get(set.get("attribute"))==null){
+        user.getDimensionValues().put((String) set.get("attribute"), new DimensionValueStats());
       }
-      user.getStatMap().get(set.get("attribute")).incrementCount();
+      user.getDimensionValues().get(set.get("attribute")).incrementCount();
     }
   }
 }

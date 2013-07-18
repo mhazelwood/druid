@@ -17,15 +17,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package druid.examples.personalization;
+
 import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysql.jdbc.PreparedStatement;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -35,6 +38,14 @@ public class BasicParseWithUsername
 {
   private final static SetParser parser = new SetParser();
   private final static Map<String,UserInformation> userMap = Maps.newHashMap();
+
+  private java.sql.Connection con = null;
+  private PreparedStatement pst = null;
+  private ResultSet rs = null;
+  private String url = "jdbc:mysql://127.0.0.1:3306";
+  private String user = "root";
+  private String password = "";
+
   public static void main(String [] args){
     BufferedReader br = null;
     ObjectMapper mapper = new ObjectMapper();

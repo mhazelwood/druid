@@ -72,10 +72,10 @@ public class FilterParser extends Parser
 
   public void addDimensionValue(UserInformation user, String dimensionName, String dimensionValue){
     dimensionList.add(dimensionName);
-    if (user.getStatMap().get(dimensionName)==null){
-      user.getStatMap().put(dimensionName,new DimensionValueStats());
+    if (user.getDimensionValues().get(dimensionName)==null){
+      user.getDimensionValues().put(dimensionName,new DimensionValueStats());
     }
-    DimensionValueStats dim= user.getStatMap().get(dimensionName);
+    DimensionValueStats dim= user.getDimensionValues().get(dimensionName);
     dim.incrementCount();
     incrementMap(dimensionValue,dim.getDimensionValues());
   }
