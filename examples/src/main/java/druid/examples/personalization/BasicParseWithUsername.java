@@ -22,13 +22,16 @@ import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysql.jdbc.PreparedStatement;
+import com.mysql.jdbc.Statement;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -39,12 +42,12 @@ public class BasicParseWithUsername
   private final static SetParser parser = new SetParser();
   private final static Map<String,UserInformation> userMap = Maps.newHashMap();
 
-  private java.sql.Connection con = null;
-  private PreparedStatement pst = null;
-  private ResultSet rs = null;
-  private String url = "jdbc:mysql://127.0.0.1:3306";
-  private String user = "root";
-  private String password = "";
+  private static java.sql.Connection con = null;
+  private static PreparedStatement pst = null;
+  private static ResultSet rs = null;
+  private static String url = "jdbc:mysql://127.0.0.1:3306";
+  private static String user = "root";
+  private static String password = "";
 
   public static void main(String [] args){
     BufferedReader br = null;
@@ -58,6 +61,8 @@ public class BasicParseWithUsername
       }
     };
     try{
+      con = DriverManager.getConnection(url, user, password);
+      Statement st = (Statement) con.createStatement();
       String currentLine;
       br = new BufferedReader(new FileReader("/Users/dhruvparthasarathy/Desktop/userQueries2.log"));
       while ((currentLine = br.readLine()) != null) {
@@ -89,6 +94,9 @@ public class BasicParseWithUsername
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
     catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+    catch (SQLException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
     int x=5;
