@@ -71,7 +71,7 @@ public class FilterParser extends Parser
           incrementMap(name,user.getDimensionValues().get(attribute));
         }
       }
-    }
+    }                                Bu
   }
 
   public void addDimensionNameCrossTerm(UserInformation user, List<String> dimensionList){
