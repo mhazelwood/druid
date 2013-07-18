@@ -19,7 +19,6 @@
 package druid.examples.personalization;
 
 import com.beust.jcommander.internal.Maps;
-import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.testng.Assert;
 
@@ -33,7 +32,7 @@ public class ApplyParserTest
   {
     Map<String,Object> set = Maps.newHashMap();
     set.put("name","revenue");
-    Parser applyParser = new ApplyParser(ImmutableList.<String>of("publisher"));
+    Parser applyParser = new ApplyParser();
     applyParser.parse(user, set);
     Assert.assertEquals( user.getMetricTypes().get("revenue"),new Integer(1));
   }

@@ -18,16 +18,12 @@
  */
 package druid.examples.personalization;
 
-import com.beust.jcommander.internal.Lists;
-
 import java.util.List;
 import java.util.Map;
 
 public class SetParser
 {
-  private List<String> dimensionList;
   public void parse(List<Map<String,Object>> query, UserInformation user){
-    dimensionList = Lists.newArrayList();
     for (Map<String,Object> operationSet:query){
       this.parseOperation((String) operationSet.get("operation"), operationSet, user);
     }
@@ -37,13 +33,13 @@ public class SetParser
   public void parseOperation(String setType, Map<String,Object> set, UserInformation user){
     Parser parser=null;
     if (setType.equals("filter")){
-      parser=new FilterParser(dimensionList);
+      parser=new FilterParser();
     }
     else if (setType.equals("split")){
       parser = new SplitParser();
     }
     else if (setType.equals("apply")){
-      parser = new ApplyParser(dimensionList);
+      parser = new ApplyParser();
     }
     if (parser!=null){
       parser.parse(user, set);

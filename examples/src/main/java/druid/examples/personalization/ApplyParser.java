@@ -18,17 +18,10 @@
  */
 package druid.examples.personalization;
 
-import java.util.List;
 import java.util.Map;
 
 public class ApplyParser extends Parser
 {
-  private List<String> dimensionList;
-
-  public ApplyParser(List<String> dimensionList)
-  {
-    this.dimensionList=dimensionList;
-  }
 
   @Override
   public void parse(
@@ -36,11 +29,6 @@ public class ApplyParser extends Parser
   )
   {
     incrementMap((String) set.get("name"),user.getMetricTypes());
-    StringBuilder builder = new StringBuilder();
-    for (String dimensionName:dimensionList){
-      builder.append(dimensionName);
-      builder.append(",");
-    }
-    incrementMap(builder.toString()+",    "+set.get("name"),user.getNameMetricCrossTerm());
+     incrementMap("total",user.getMetricTypes());
   }
 }

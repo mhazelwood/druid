@@ -18,68 +18,78 @@
  */
 package druid.examples.personalization;
 
+import com.beust.jcommander.internal.Lists;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FilterParser extends Parser
 {
-  private final List<String> dimensionList;
+  private final List<String> dimensionList = Lists.newArrayList();
 
-  public FilterParser(List<String> dimensionList)
+  public FilterParser()
   {
-    this.dimensionList = dimensionList;
   }
 
   @Override
-  public void parse(UserInformation user,Map<String,Object> set){
-    addFilter(user,set);
+  public void parse(UserInformation user, Map<String, Object> set)
+  {
+    addFilter(user, set);
     Collections.sort(dimensionList);
     addDimensionNameCrossTerm(user, dimensionList);
-    addDimensionNameCrossTerm(user, dimensionList);
   }
+
   public void addFilter(
       UserInformation user, Map<String, Object> set
   )
   {
-    if (set.get("type").equals("and") || set.get("type").equals("or")){
-      for (Map<String,Object> filter:(List<Map<String,Object>>)set.get("filters")){
+    String type = (String) set.get("type");
+    if (type.equals("and") || type.equals("or")) {
+      for (Map<String, Object> filter : (List<Map<String, Object>>) set.get("filters")) {
         parse(user, filter);
       }
-    }
-    else if (set.get("type").equals("not")){
-      parse(user, (Map<String, Object>) set.get("filter"));
-    }
+    } else if (type.equals("not")) {
+        parse(user, (Map<String, Object>) set.get("filter"));
+    } else if (!set.get("attribute").equals("timestamp")) {
+        String dimensionName = (String) set.get("attribute");
+        String dimensionValue;
+        if (type.equals("is")) {
+          dimensionValue = (String) set.get("value");
+          addDimensionValue(user,dimensionName, dimensionValue);
 
-    else if(!set.get("attribute").equals("timestamp")){
-      if (set.get("type").equals("is")){
-        incrementMap((String) set.get("attribute"),user.getDimensionNames());
-        dimensionList.add((String) set.get("attribute"));
-        if (user.getDimensionValues().get(set.get("attribute"))==null){
-          user.getDimensionValues().put((String) set.get("attribute"), new HashMap<String,Integer>());
         }
-
-        incrementMap((String) set.get("value"),user.getDimensionValues().get(set.get("attribute")));
-      }
-      else if (set.get("type").equals("in")){
-        String attribute = (String) set.get("attribute");
-        dimensionList.add((String) set.get("attribute"));
-        for(String name: (ArrayList<String>) set.get("values")){
-          addDimensionType(user, attribute);
-          incrementMap(name,user.getDimensionValues().get(attribute));
+        else if (set.get("type").equals("in"))
+        {
+          for (String dimValue : (ArrayList<String>) set.get("values"))
+          {
+            addDimensionValue(user, dimensionName, dimValue);
+          }
         }
       }
-    }
   }
 
-  public void addDimensionNameCrossTerm(UserInformation user, List<String> dimensionList){
-    StringBuilder builder = new StringBuilder();
-    for (String dimensionName:dimensionList){
-      builder.append(dimensionName);
-      builder.append(",");
+  public void addDimensionValue(UserInformation user, String dimensionName, String dimensionValue){
+    dimensionList.add(dimensionName);
+    if (user.getStatMap().get(dimensionName)==null){
+      user.getStatMap().put(dimensionName,new DimensionValueStats());
     }
-    incrementMap(builder.toString(),user.getDimensionNameCrossTerm());
+    DimensionValueStats dim= user.getStatMap().get(dimensionName);
+    dim.incrementCount();
+    incrementMap(dimensionValue,dim.getDimensionValues());
+  }
+
+  public void addDimensionNameCrossTerm(UserInformation user, List<String> dimensionList)
+  {
+    StringBuilder builder = new StringBuilder();
+    if (dimensionList.size() > 0) {
+      for (String dimensionName : dimensionList) {
+        builder.append(dimensionName);
+        builder.append(",");
+      }
+      incrementMap(builder.toString(), user.getDimensionNameCrossTerm());
+      incrementMap("total", user.getDimensionNameCrossTerm());
+    }
   }
 }

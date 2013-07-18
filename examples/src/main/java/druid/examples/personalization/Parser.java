@@ -18,7 +18,6 @@
  */
 package druid.examples.personalization;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Parser
@@ -31,13 +30,6 @@ public abstract class Parser
     }
     else{
       map.put(key,1);
-    }
-  }
-
-  public void addDimensionType(UserInformation user,String dimension){
-    incrementMap(dimension,user.getDimensionNames());
-    if  (user.getDimensionValues().get(dimension)==null){
-      user.getDimensionValues().put(dimension,new HashMap<String,Integer>());
     }
   }
 }

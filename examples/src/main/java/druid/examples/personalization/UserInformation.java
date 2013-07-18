@@ -25,8 +25,7 @@ import java.util.Map;
 public class UserInformation
 {
   private final String userName;
-  private final Map<String,Integer> dimensionNames = Maps.newHashMap();
-  private final Map<String,Map<String,Integer>> dimensionValues =Maps.newHashMap();
+  private final Map<String,DimensionValueStats> statMap =Maps.newHashMap();
   private final Map<String,Integer> nameMetricCrossTerm = Maps.newHashMap();
   private final Map<String,Integer> dimensionNameCrossTerm = Maps.newHashMap();
 
@@ -54,14 +53,9 @@ public class UserInformation
     return userName;
   }
 
-  public Map<String, Integer> getDimensionNames()
+  public Map<String,DimensionValueStats> getStatMap()
   {
-    return dimensionNames;
-  }
-
-  public Map<String,Map<String,Integer>> getDimensionValues()
-  {
-    return dimensionValues;
+    return statMap;
   }
 
   public Map<String, Integer> getMetricTypes()
