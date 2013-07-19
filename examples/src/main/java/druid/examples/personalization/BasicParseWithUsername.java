@@ -18,20 +18,27 @@
  */
 package druid.examples.personalization;
 
-import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
+import com.google.common.collect.Maps;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
+import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,10 +49,10 @@ public class BasicParseWithUsername
   private final static SetParser parser = new SetParser();
   private final static Map<String,UserInformation> userMap = Maps.newHashMap();
 
-  private static java.sql.Connection con = null;
-  private static PreparedStatement pst = null;
+  private static Connection con = null;
+  private static PreparedStatement ps = null;
   private static ResultSet rs = null;
-  private static String url = "jdbc:mysql://127.0.0.1:3306";
+  private static String url = "jdbc:mysql://127.0.0.1:3306/dhruv";
   private static String user = "root";
   private static String password = "";
 
@@ -68,10 +75,8 @@ public class BasicParseWithUsername
       while ((currentLine = br.readLine()) != null) {
       String nameRegExp="( )([^ ]*@[^ ]*)";
         String queryRegExp="(body=)(.*)";
-        Pattern namePattern = Pattern.compile(nameRegExp);
-        Matcher nameMatcher = namePattern.matcher(currentLine);
-        Pattern queryPattern = Pattern.compile(queryRegExp);
-        Matcher queryMatcher = queryPattern.matcher(currentLine);
+        Matcher nameMatcher = getMatcher(nameRegExp, currentLine);
+        Matcher queryMatcher = getMatcher(queryRegExp, currentLine);
         if (nameMatcher.find()&&queryMatcher.find()){
           String userName = nameMatcher.group(2);
           UserInformation user = userMap.get(userName);
@@ -89,6 +94,16 @@ public class BasicParseWithUsername
           }
         }
       }
+      for (String user: userMap.keySet()){
+        ps = con.prepareStatement("INSERT INTO USERS(NAME, DIMENSION_VALUES, DIMENSION_NAMES) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE DIMENSION_VALUES=?, DIMENSION_NAMES=?");
+        ps.setString(1, user);
+        ps.setBlob(2, getBlob(userMap.get(user).getDimensionValues()));
+        ps.setBlob(3, getBlob(userMap.get(user).getDimensionNameCrossTerm()));
+        ps.setBlob(4, getBlob(userMap.get(user).getDimensionValues()));
+        ps.setBlob(5, getBlob(userMap.get(user).getDimensionNameCrossTerm()));
+        ps.executeUpdate();
+      }
+      con.close();
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -100,6 +115,30 @@ public class BasicParseWithUsername
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
     int x=5;
+  }
+
+  public static Blob getBlob(Object obj) throws IOException, SQLException
+  {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    ObjectOutputStream out = new ObjectOutputStream(bos);
+    out.writeObject(obj);
+    byte[] byteStream = bos.toByteArray();
+    return new SerialBlob(byteStream);
+  }
+
+  public static Object deserializeBlob(Blob blob) throws IOException, ClassNotFoundException, SQLException
+  {
+    ByteArrayInputStream b = new ByteArrayInputStream(blob.getBytes(1,(int)blob.length()));
+    ObjectInputStream o = new ObjectInputStream(b);
+    blob.free();
+    return o.readObject();
+  }
+
+
+  public static Matcher getMatcher(String regexp, String currentLine){
+    Pattern pattern = Pattern.compile(regexp);
+    Matcher matcher = pattern.matcher(currentLine);
+    return matcher;
   }
 
 
