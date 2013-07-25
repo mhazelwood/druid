@@ -74,17 +74,17 @@ public class InputSupplierUpdateStream implements UpdateStream
           }
 
           catch (InterruptedException e){
-            log.info(e, "Thread adding events to the queue interrupted");
+            log.error(e, "Thread adding events to the queue interrupted");
             return;
           }
           catch (JsonMappingException e) {
-            log.info(e, "Error in converting json to map");
+            log.error(e, "Error in converting json to map");
           }
           catch (JsonParseException e) {
-            log.info(e, "Error in parsing json");
+            log.error(e, "Error in parsing json");
           }
           catch (IOException e) {
-            log.info(e, "Error in connecting to InputStream");
+            log.error(e, "Error in connecting to InputStream");
           }
         }
       }
