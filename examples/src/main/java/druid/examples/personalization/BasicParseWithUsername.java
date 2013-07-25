@@ -94,6 +94,7 @@ public class BasicParseWithUsername
           }
         }
       }
+      int x=5;
       for (String user: userMap.keySet()){
         ps = con.prepareStatement("INSERT INTO USERS(NAME, DIMENSION_VALUES, DIMENSION_NAMES) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE DIMENSION_VALUES=?, DIMENSION_NAMES=?");
         ps.setString(1, user);
