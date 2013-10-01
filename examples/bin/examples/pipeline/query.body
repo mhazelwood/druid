@@ -1,0 +1,12 @@
+{
+    "queryType": "groupBy",
+    "dataSource": "pipelinestream",
+    "granularity": "all",
+    "dimensions": ["lang", "content_subtype"],
+    "aggregations":[
+      { "type": "count", "name": "rows"},
+      { "type": "doubleSum", "fieldName": "articles", "name": "articles"}
+    ],
+    "filter": { "type": "selector", "dimension": "lang", "value": "en" },
+    "intervals":["2012-10-01T00:00/2020-01-01T00"]
+}
