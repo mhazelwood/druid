@@ -1,5 +1,6 @@
 package druid.examples;
 
+import com.attensity.druid.PipelineFirehoseFactory;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.metamx.common.lifecycle.Lifecycle;
@@ -40,6 +41,7 @@ public class RealtimeStandaloneMain
 
     // register the Firehoses
     rn.registerJacksonSubtype(
+        new NamedType(PipelineFirehoseFactory.class, "pipeline"),
         new NamedType(TwitterSpritzerFirehoseFactory.class, "twitzer"),
         new NamedType(FlightsFirehoseFactory.class, "flights"),
         new NamedType(RandomFirehoseFactory.class, "rand"),
