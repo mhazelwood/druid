@@ -117,9 +117,9 @@ public class PipelineFirehose implements Firehose, WebSocketListener,
     startMsec = System.currentTimeMillis();
 
 
-    dimensions.add("htags");
     dimensions.add("lang");
-    dimensions.add("utc_offset");
+    dimensions.add("content_type");
+    dimensions.add("content_subtype");
 
     //
     // set up Pipeline

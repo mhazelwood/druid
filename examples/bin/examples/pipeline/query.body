@@ -2,7 +2,7 @@
     "queryType": "groupBy",
     "dataSource": "pipelinestream",
     "granularity": "all",
-    "dimensions": ["lang", "content_subtype"],
+    "dimensions": ["content_type", "content_subtype"],
     "aggregations":[
       { "type": "count", "name": "rows"},
       { "type": "doubleSum", "fieldName": "articles", "name": "articles"}
